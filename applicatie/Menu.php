@@ -1,7 +1,13 @@
 <?php
   require_once 'db_connect.php';
   require_once 'functions.php';
-
+  
+  session_start();
+  if (!isset($_SESSION['username'])) {
+    header('Location: login.php');
+    exit();
+  }
+  
   $menu = getMenu(); 
 ?>
 
@@ -13,6 +19,9 @@
     <title>Menu</title>
     </head>
 <body>
+    <form action="logout.php" method="post">
+      <button type="submit">Logout</button>
+    </form>
     <?php echo $menu; ?>
 </body>
 </html>

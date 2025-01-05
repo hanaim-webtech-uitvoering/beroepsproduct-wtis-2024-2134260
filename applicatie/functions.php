@@ -25,5 +25,32 @@ function getMenu() {
       }
 
       return $menu;
+}
+
+function checkUser($username, $password) {
+    global $verbinding;
+
+    $query = 'SELECT username, password, role FROM "User" WHERE username = :username';
+    $parameters = [':username' => $username];
+
+    try {
+        $statement = $verbinding->prepare($query);
+        $statement->execute($parameters);
+        $row = $statement->fetch(PDO::FETCH_ASSOC);
+
+        if ($row) {
+            $hashedPassword = $row['password'];
+            if (password_verify($password, $hashedPassword)) {
+                unset($row['password']);
+                        header('Location: menu.php');
+
+                return $row;
+            }
+        }
+        return null; 
+    } catch (PDOException $e) {
+        error_log("Error executing query: " . $e->getMessage());
+        return null;
     }
+}
 ?>
