@@ -1,56 +1,90 @@
 <?php
-function getMenu() {
+function getMenu()
+{
+  global $verbinding;
 
-    require_once 'db_connect.php';
+  $query = 'SELECT "name", price FROM Product';
 
-      $query = 'SELECT "name", price FROM Product';
-  
-      try{
-        $db = maakVerbinding();
-        $data = $db->query($query);
-    
-        $menu = "<table>";
-        $menu .= "<tr><th>Product</th><th>Prijs</th></tr>";
-        
-        foreach ($data as $row) {
-          $product = $row['name'];
-          $price = $row['price'];
-        
-          $menu .= "<tr><td>$product</td><td>$price</td></tr>";
-        }
-        
-        $menu .= "</table>";
-      } catch (PDOException $e) {
-        $menu = "Error retrieving menu: " . $e->getMessage();
-      }
+  try {
+    $data = $verbinding->query($query);
 
-      return $menu;
+    $menu = "<table>";
+    $menu .= "<tr><th>Product</th><th>Prijs</th></tr>";
+
+    foreach ($data as $row) {
+      $product = $row['name'];
+      $price = $row['price'];
+
+      $menu .= "<tr><td>$product</td><td>$price</td></tr>";
+    }
+
+    $menu .= "</table>";
+  } catch (PDOException $e) {
+    $menu = "Error retrieving menu: " . $e->getMessage();
+  }
+
+  return $menu;
 }
 
-function checkUser($username, $password) {
-    global $verbinding;
+function checkUser($username, $password)
+{
+  global $verbinding;
 
-    $query = 'SELECT username, password, role FROM "User" WHERE username = :username';
-    $parameters = [':username' => $username];
+  $query = 'SELECT username, password, role FROM "User" WHERE username = :username';
+  $parameters = [':username' => $username];
 
-    try {
-        $statement = $verbinding->prepare($query);
-        $statement->execute($parameters);
-        $row = $statement->fetch(PDO::FETCH_ASSOC);
+  try {
+    $statement = $verbinding->prepare($query);
+    $statement->execute($parameters);
+    $row = $statement->fetch(PDO::FETCH_ASSOC);
 
-        if ($row) {
-            $hashedPassword = $row['password'];
-            if (password_verify($password, $hashedPassword)) {
-                unset($row['password']);
-                        header('Location: menu.php');
+    if ($row) {
+      $hashedPassword = $row['password'];
+      if (password_verify($password, $hashedPassword)) {
+        unset($row['password']);
+        header('Location: menu.php');
 
-                return $row;
-            }
-        }
-        return null; 
-    } catch (PDOException $e) {
-        error_log("Error executing query: " . $e->getMessage());
-        return null;
+        return $row;
+      }
     }
+    return null;
+  } catch (PDOException $e) {
+    error_log("Error executing query: " . $e->getMessage());
+    return null;
+  }
+}
+
+function getOrderOverview_P($username)
+{
+  global $verbinding;
+
+  $query = 'SELECT pop.product_name, pop.quantity, po.status FROM Pizza_Order_Product pop INNER JOIN Pizza_Order po ON pop.order_id = po.order_id  WHERE personnel_username = :username';
+  $parameters = [':username' => $username];
+
+  $orders = "<table>";
+  $orders .= "<tr><th>Product</th><th>Hoeveelheid</th><th>status</th></tr>";
+
+  try {
+    $statement = $verbinding->prepare($query);
+    $statement->execute($parameters);
+    $row = $statement->fetch(PDO::FETCH_ASSOC);
+
+    if ($row) {
+      for ($i = 0; $i < count($row); $i++) {
+        $productName = $row['product_name'];
+        $quantity = $row['quantity'];
+        $status = $row['status'];
+
+        $orders .= "<tr><td>$productName</td><td>$quantity</td><td>$status</td></tr>";
+      }
+    }
+    $orders .= "</table>";
+
+  } catch (PDOException $e) {
+    error_log("Error executing query: " . $e->getMessage());
+    return null;
+  }
+  
+  return $orders;
 }
 ?>

@@ -3,12 +3,12 @@ require_once 'db_connect.php';
 require_once 'functions.php';
 
 session_start();
-if (!isset($_SESSION['username'])) {
-  header('Location: login.php');
-  exit();
+if (!isset($_SESSION['username']) && !isset($_SESSION['role']) && $_SESSION['role'] == 'Personnel') {
+    header('Location: login.php');
+    exit();
 }
 
-$menu = getMenu();
+ $orders = getOrderOverview_P($_SESSION['username']);
 ?>
 
 <html lang="en">
@@ -17,14 +17,14 @@ $menu = getMenu();
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Menu</title>
+  <title>Orders</title>
 </head>
 
 <body>
   <form action="logout.php" method="post">
     <button type="submit">Logout</button>
   </form>
-  <?php echo $menu; ?>
+  <?php echo $orders; ?>
 </body>
 
 </html>
