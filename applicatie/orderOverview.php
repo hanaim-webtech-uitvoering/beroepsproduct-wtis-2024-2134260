@@ -3,7 +3,7 @@ require_once 'db_connect.php';
 require_once 'functions.php';
 
 session_start();
-if (!isset($_SESSION['username']) && !isset($_SESSION['role']) && $_SESSION['role'] == 'Personnel') {
+if (!isset($_SESSION['username']) && !isset($_SESSION['role']) || $_SESSION['role'] != 'Personnel') {
   header('Location: login.php');
   exit();
 }

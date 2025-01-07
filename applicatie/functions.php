@@ -92,4 +92,42 @@ function getOrderOverview_P($username)
 
   return $orders;
 }
+
+function getOrderOverview_U($username)
+{
+  global $verbinding;
+
+  $query = 'SELECT pop.product_name, pop.quantity FROM Pizza_Order_Product pop INNER JOIN Pizza_Order po ON pop.order_id = po.order_id WHERE client_username = :username';
+  $parameters = [':username' => $username];
+
+  $orders = "<table>";
+  $orders .= "<tr><th>Product</th><th>Hoeveelheid</th></tr>";
+
+  try {
+    $statement = $verbinding->prepare($query);
+    $statement->execute($parameters);
+    $rows = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+    if ($rows) {
+      foreach ($rows as $row) {
+        $productName = $row['product_name'];
+        $quantity = $row['quantity'];
+
+        $orders .= "<tr><td>$productName</td><td>$quantity</td></tr>";
+      }
+    }
+
+    $orders .= "</table>";
+
+    if (sizeof($rows) == 0) {
+      $orders = "U heeft nog geen orders";
+    }
+
+  } catch (PDOException $e) {
+    error_log("Error executing query: " . $e->getMessage());
+    return null;
+  }
+
+  return $orders;
+}
 ?>
