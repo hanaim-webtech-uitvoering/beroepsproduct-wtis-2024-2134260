@@ -58,19 +58,19 @@ function getOrderOverview_P($username)
 {
   global $verbinding;
 
-  $query = 'SELECT pop.product_name, pop.quantity, po.status FROM Pizza_Order_Product pop INNER JOIN Pizza_Order po ON pop.order_id = po.order_id  WHERE personnel_username = :username';
+  $query = 'SELECT pop.product_name, pop.quantity, po.status FROM Pizza_Order_Product pop INNER JOIN Pizza_Order po ON pop.order_id = po.order_id WHERE personnel_username = :username';
   $parameters = [':username' => $username];
 
   $orders = "<table>";
-  $orders .= "<tr><th>Product</th><th>Hoeveelheid</th><th>status</th></tr>";
+  $orders .= "<tr><th>Product</th><th>Hoeveelheid</th><th>Status</th></tr>";
 
   try {
     $statement = $verbinding->prepare($query);
     $statement->execute($parameters);
-    $row = $statement->fetch(PDO::FETCH_ASSOC);
+    $rows = $statement->fetchAll(PDO::FETCH_ASSOC);
 
-    if ($row) {
-      for ($i = 0; $i < count($row); $i++) {
+    if ($rows) {
+      foreach ($rows as $row) {
         $productName = $row['product_name'];
         $quantity = $row['quantity'];
         $status = $row['status'];
@@ -78,13 +78,18 @@ function getOrderOverview_P($username)
         $orders .= "<tr><td>$productName</td><td>$quantity</td><td>$status</td></tr>";
       }
     }
+
     $orders .= "</table>";
+    
+    if (sizeof($rows) == 0) {
+      $orders = "U heeft nog geen orders";
+    }
 
   } catch (PDOException $e) {
     error_log("Error executing query: " . $e->getMessage());
     return null;
   }
-  
+
   return $orders;
 }
 ?>
