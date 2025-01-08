@@ -80,7 +80,7 @@ function getOrderOverview_P($username)
     }
 
     $orders .= "</table>";
-    
+
     if (sizeof($rows) == 0) {
       $orders = "U heeft nog geen orders";
     }
@@ -129,5 +129,24 @@ function getOrderOverview_U($username)
   }
 
   return $orders;
+}
+
+function addUser($username, $password, $first_name, $last_name, $address)
+{
+  global $verbinding;
+
+  $query = 'INSERT INTO "user" (username, password, first_name, last_name, role, address) VALUES (:username, :password, :first, :last, :role, :address)';
+  $parameters = [':username' => $username, ':password' => $password, ':first' => $first_name, ':last' => $last_name, ':role' => 'Client', 'address' => $address];
+
+  try {
+    $statement = $verbinding->prepare($query);
+    $statement->execute($parameters);
+
+  } catch (PDOException $e) {
+    error_log("Error executing query: " . $e->getMessage());
+    return null;
+  }
+
+  return true;
 }
 ?>

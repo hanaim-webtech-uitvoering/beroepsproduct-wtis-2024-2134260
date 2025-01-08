@@ -26,8 +26,10 @@ $orders = getOrderOverview_U($_SESSION['username']);
             <li><a href="menu.php">Menu</a></li>
             <li><a href="winkelmandje.php">Winkelmandje</a></li>
             <li><a href="profile.php">Profiel</a></li>
-            <li><a href="orderOverview.php">bestelling overzicht</a></li>
-            <li><a href="detailOverview.php">Detail overzicht</a></li>
+            <?php if ($_SESSION['role'] == 'Personnel'): ?>
+                <li><a href="orderOverview.php">bestelling overzicht</a></li>
+                <li><a href="detailOverview.php">Detail overzicht</a></li>
+            <?php endif; ?>
             <li><a href="privacyverklaring.php">Privacyverklaring</a></li>
         </ul>
     </nav>
