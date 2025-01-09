@@ -12,7 +12,7 @@ if (isset($_SESSION['username'])) {
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-  $username = $_POST['username'];
+  $username = htmlspecialchars(trim($_POST['username']));
   $password = $_POST['password'];
 
   $result = checkUser($username, $password);

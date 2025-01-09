@@ -2,15 +2,46 @@
 require_once 'db_connect.php';
 require_once 'functions.php';
 
-$username = $_POST['username'];
-$password = $_POST['password'];
-$first_name = $_POST['first_name'];
-$last_name = $_POST['last_name'];
-$address = $_POST['address'];
+$error = '';
 
-if(addUser($username, $password, $first_name,$last_name, $address)){
-  header('Location: login.php');
-  exit();
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+  if (empty($_POST['username'])) {
+    $error .= "Gebruikersnaam is verplicht. <br> ";
+  } else {
+    $username = htmlspecialchars(trim($_POST['username']));
+  }
+
+  if (empty($_POST['password'])) {
+    $error .= "Wachtwoord is verplicht. <br> ";
+  } else {
+    $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
+  }
+
+  if (empty($_POST['first_name'])) {
+    $error .= "Voornaam is verplicht. <br> ";
+  } else {
+    $first_name = htmlspecialchars(trim($_POST['first_name']));
+  }
+
+  if (empty($_POST['last_name'])) {
+    $error .= "Achternaam is verplicht. <br> ";
+  } else {
+    $last_name = htmlspecialchars(trim($_POST['last_name']));
+  }
+
+  $address = !empty($_POST['address']) ? htmlspecialchars(trim($_POST['address'])) : null;
+
+  if ($error === '') {
+    if (!checkUserExists($username)) {
+      if (addUser($username, $password, $first_name, $last_name, $address)) {
+        header('Location: login.php');
+        exit();
+      }
+    } else {
+      $error = 'Gebruikersnaam bestaat al';
+    }
+  }
 }
 
 ?>
@@ -25,6 +56,11 @@ if(addUser($username, $password, $first_name,$last_name, $address)){
 
 <body>
   <h1>Registreren</h1>
+
+  <?php if (!empty($error)): ?>
+    <p style="color: red;"><?php echo $error; ?></p>
+  <?php endif; ?>
+
   <form action="" method="post">
     <label for="username">Gebruikersnaam:</label><br>
     <input type="text" id="username" name="username" required><br><br>

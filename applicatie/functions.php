@@ -149,4 +149,26 @@ function addUser($username, $password, $first_name, $last_name, $address)
 
   return true;
 }
+
+function checkUserExists($username)
+{
+  global $verbinding;
+
+  $query = 'SELECT username FROM "User" where username = :username';
+  $parameters = [':username' => $username];
+  try {
+    $statement = $verbinding->prepare($query);
+    $statement->execute($parameters);
+    $results = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+    if (count($results) > 0) {
+      return true;
+    } else {
+      return false;
+    }
+  } catch (PDOException $e) {
+    error_log("Error executing query: " . $e->getMessage());
+    return null;
+  }
+}
 ?>
