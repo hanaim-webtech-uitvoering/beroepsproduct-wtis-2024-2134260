@@ -1,3 +1,12 @@
+<?php
+session_start();
+if (!isset($_SESSION['username'])) {
+  header('Location: login.php');
+  exit();
+}
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -12,7 +21,7 @@
   <nav>
     <ul>
       <li><a href="menu.php">Menu</a></li>
-      <li><a href="winkelmandje.php">Winkelmandje</a></li>
+      <li><a href="shoppingCart.php">Winkelmandje</a></li>
       <li><a href="profile.php">Profiel</a></li>
       <?php if ($_SESSION['role'] == 'Personnel'): ?>
         <li><a href="orderOverview.php">bestelling overzicht</a></li>

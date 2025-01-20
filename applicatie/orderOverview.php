@@ -24,7 +24,7 @@ $orders = getOrderOverview_P($_SESSION['username']);
   <nav>
     <ul>
       <li><a href="menu.php">Menu</a></li>
-      <li><a href="winkelmandje.php">Winkelmandje</a></li>
+      <li><a href="shoppingCart.php">Winkelmandje</a></li>
       <li><a href="profile.php">Profiel</a></li>
       <li><a href="orderOverview.php">bestelling overzicht</a></li>
       <li><a href="detailOverview.php">Detail overzicht</a></li>
