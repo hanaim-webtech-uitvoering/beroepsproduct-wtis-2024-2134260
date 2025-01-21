@@ -11,6 +11,7 @@ if (!isset($_SESSION['username'])) {
 $menu = getMenu();
 ?>
 
+<!DOCTYPE html>
 <html lang="en">
 
 <head>

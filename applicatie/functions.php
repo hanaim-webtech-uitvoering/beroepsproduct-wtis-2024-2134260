@@ -58,11 +58,11 @@ function getOrderOverview_P($username)
 {
   global $verbinding;
 
-  $query = 'SELECT pop.product_name, pop.quantity, po.status FROM Pizza_Order_Product pop INNER JOIN Pizza_Order po ON pop.order_id = po.order_id WHERE personnel_username = :username';
+  $query = 'SELECT pop.product_name, pop.quantity, po.status, po.order_id FROM Pizza_Order_Product pop INNER JOIN Pizza_Order po ON pop.order_id = po.order_id WHERE personnel_username = :username';
   $parameters = [':username' => $username];
 
   $orders = "<table>";
-  $orders .= "<tr><th>Product</th><th>Hoeveelheid</th><th>Status</th></tr>";
+  $orders .= "<tr><th>Product</th><th>Hoeveelheid</th><th>Status</th><th>Update status</th></tr>";
 
   try {
     $statement = $verbinding->prepare($query);
@@ -74,8 +74,20 @@ function getOrderOverview_P($username)
         $productName = $row['product_name'];
         $quantity = $row['quantity'];
         $status = $row['status'];
+        $orderId = $row['order_id'];
 
-        $orders .= "<tr><td>$productName</td><td>$quantity</td><td>$status</td></tr>";
+        $orders .= "<tr><td>$productName</td><td>$quantity</td><td>$status</td><td>
+              <form action='orderOverview.php' method='POST'>
+                <input type='hidden' name='order_id' value='$orderId'>
+                <input type='hidden' name='status' value='" . ($status - 1) . "'>
+                <button type='submit' " . ($status <= 1 ? 'disabled' : '') . ">-1</button>
+              </form>
+              <form action='orderOverview.php' method='POST'>
+                <input type='hidden' name='order_id' value='$orderId'>
+                <input type='hidden' name='status' value='" . ($status + 1) . "'>
+                <button type='submit' " . ($status >= 3 ? 'disabled' : '') . ">+1</button>
+              </form>
+            </td></tr>";
       }
     }
 
@@ -214,4 +226,48 @@ function checkUserExists($username)
     return null;
   }
 }
+
+function updateStatus($id, $status)
+{
+  global $verbinding;
+
+  $query = 'UPDATE Pizza_Order SET status = :status WHERE order_id = :id';
+  $parameters = [':status' => $status,':id'=> $id];
+  try {
+    $statement = $verbinding->prepare($query);
+    $statement->execute($parameters);
+  } catch (PDOException $e) {
+    error_log(''. $e->getMessage());
+  }
+}
+
+function getValidId($username)
+{
+  global $verbinding;
+
+  $query = 'SELECT order_id FROM Pizza_Order WHERE personnel_username = :username';
+  $parameters = [':username' => $username];
+  try {
+    $statement = $verbinding->prepare($query);
+    $statement->execute($parameters);
+    $rows = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+    if ($rows) {
+      $idArray = [];
+
+      foreach ($rows as $row) {
+        $orderId = $row['order_id']; 
+        $idArray[] = $orderId;
+      }
+      
+      return $idArray;
+    } else {
+      return [];
+    }
+  } catch (PDOException $e) {
+    error_log('' . $e->getMessage());
+    return [];
+  }
+}
+
 ?>

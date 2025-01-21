@@ -11,6 +11,7 @@ if (!isset($_SESSION['username'])) {
 $orders = getOrderOverview_U($_SESSION['username']);
 ?>
 
+<!DOCTYPE html>
 <html lang="en">
 
 <head>

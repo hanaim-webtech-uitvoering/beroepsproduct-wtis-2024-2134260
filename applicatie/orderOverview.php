@@ -3,14 +3,37 @@ require_once 'db_connect.php';
 require_once 'functions.php';
 
 session_start();
-if (!isset($_SESSION['username']) && !isset($_SESSION['role']) || $_SESSION['role'] != 'Personnel') {
+if (!isset($_SESSION['username']) || $_SESSION['role'] != 'Personnel') {
   header('Location: login.php');
   exit();
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+  if (isset($_POST['order_id']) && isset($_POST['status'])) {
+    $orderId = intval($_POST['order_id']);
+    $status = intval($_POST['status']);
+
+    $validIds = getValidId($_SESSION['username']); 
+
+    if (in_array($orderId, $validIds)) {
+      if ($status >= 1 && $status <= 3) {
+        updateStatus($orderId, $status);
+        $message = "Status updated successfully!";
+      } else {
+        $message = "Invalid status value.";
+      }
+    } else {
+      $message = "Invalid order ID.";
+    }
+  } else {
+    $message = "Invalid input.";
+  }
 }
 
 $orders = getOrderOverview_P($_SESSION['username']);
 ?>
 
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -34,6 +57,13 @@ $orders = getOrderOverview_P($_SESSION['username']);
   <form action="logout.php" method="post">
     <button type="submit">Logout</button>
   </form>
+
+  <?php
+  if (isset($message)) {
+    echo "<p>$message</p>";
+  }
+  ?>
+
   <?php echo $orders; ?>
 </body>
 
