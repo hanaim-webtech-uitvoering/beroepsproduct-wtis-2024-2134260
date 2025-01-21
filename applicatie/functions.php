@@ -3,7 +3,7 @@ function getMenu()
 {
   global $verbinding;
 
-  $query = 'SELECT "name", price FROM Product';
+  $query = 'SELECT name, price FROM Product';
 
   try {
     $data = $verbinding->query($query);
@@ -13,9 +13,17 @@ function getMenu()
 
     foreach ($data as $row) {
       $product = $row['name'];
-      $price = $row['price'];
+      $price = $row['price']; 
 
-      $menu .= "<tr><td>$product</td><td>$price</td></tr>";
+      $menu .= "<tr><td>$product</td><td>€$price</td><td>
+                    <form action='menu.php' method='post'>
+                      <input type='hidden' name='product_name' value='$product'>
+                      <input type='hidden' name='price' value='$price'>
+                      <input type='number' name='quantity' min='1' value='1' required>
+                      <button type='submit'>Voeg toe aan uw winkelmandje</button>
+                    </form>
+                  </td>
+                </tr>";
     }
 
     $menu .= "</table>";
