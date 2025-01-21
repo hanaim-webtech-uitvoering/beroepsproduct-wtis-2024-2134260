@@ -18,15 +18,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (in_array($orderId, $validIds)) {
       if ($status >= 1 && $status <= 3) {
         updateStatus($orderId, $status);
-        $message = "Status updated successfully!";
+        $message = "Status is geüpdate";
       } else {
-        $message = "Invalid status value.";
+        $message = "Status moet 1, 2 of 3 zijn";
       }
     } else {
-      $message = "Invalid order ID.";
+      $message = "Je mag alleen je eigen orders updaten";
     }
   } else {
-    $message = "Invalid input.";
+    $message = "Ongeldige input";
   }
 }
 
