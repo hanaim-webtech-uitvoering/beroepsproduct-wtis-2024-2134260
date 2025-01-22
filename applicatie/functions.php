@@ -236,7 +236,7 @@ function addOrder($username, $address, $orders)
 function addOrderItems($id, $orders)
 {
   global $verbinding;
-  
+
   var_dump($orders);
   var_dump($id);
 
@@ -359,6 +359,27 @@ function getValidId($username)
     error_log('Error executing query: ' . $e->getMessage());
     return [];
   }
+}
+
+function showNavbar($role) {
+    echo '<nav>
+            <ul>
+                <li><a href="menu.php">Menu</a></li>
+                <li><a href="shoppingCart.php">Winkelmandje</a></li>
+                <li><a href="profile.php">Profiel</a></li>';
+
+    if ($role == 'Personnel') {
+      echo '<li><a href="orderOverview.php">bestelling overzicht</a></li>
+              <li><a href="detailOverview.php">Detail overzicht</a></li>';
+    }
+
+    echo '<li><a href="privacyverklaring.php">Privacyverklaring</a></li>
+          </ul>
+        </nav>
+        <form action="logout.php" method="post">
+          <button type="submit">Logout</button>
+        </form>';
+  
 }
 
 ?>

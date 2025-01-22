@@ -44,19 +44,7 @@ $orders = getOrderOverview_P($_SESSION['username']);
 </head>
 
 <body>
-  <nav>
-    <ul>
-      <li><a href="menu.php">Menu</a></li>
-      <li><a href="shoppingCart.php">Winkelmandje</a></li>
-      <li><a href="profile.php">Profiel</a></li>
-      <li><a href="orderOverview.php">bestelling overzicht</a></li>
-      <li><a href="detailOverview.php">Detail overzicht</a></li>
-      <li><a href="privacyverklaring.php">Privacyverklaring</a></li>
-    </ul>
-  </nav>
-  <form action="logout.php" method="post">
-    <button type="submit">Logout</button>
-  </form>
+  <?php showNavbar($_SESSION['role']); ?>
 
   <?php
   if (isset($message)) {
