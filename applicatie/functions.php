@@ -13,12 +13,12 @@ function getMenu()
 
     foreach ($data as $row) {
       $product = $row['name'];
-      $price = $row['price']; 
+      $price = $row['price'];
 
       $menu .= "<tr><td>$product</td><td>€$price</td><td>
                     <form action='menu.php' method='post'>
-                      <input type='hidden' name='product_name' value='$product'>
-                      <input type='hidden' name='price' value='$price'>
+                      <input type='hidden' name='product_name' value=\"$product\">
+                      <input type='hidden' name='price' value=\"$price\">
                       <input type='number' name='quantity' min='1' value='1' required>
                       <button type='submit'>Voeg toe aan uw winkelmandje</button>
                     </form>
@@ -38,7 +38,7 @@ function checkUser($username, $password)
 {
   global $verbinding;
 
-  $query = 'SELECT username, password, role FROM "User" WHERE username = :username';
+  $query = 'SELECT username, password, role, address FROM "User" WHERE username = :username';
   $parameters = [':username' => $username];
 
   try {
@@ -213,6 +213,89 @@ function addUser($username, $password, $first_name, $last_name, $address)
   return true;
 }
 
+function addOrder($username, $address, $orders)
+{
+  global $verbinding;
+  $usernameP = getRandomPersonnel();
+
+  $query = "INSERT INTO Pizza_Order (client_name, client_username, personnel_username, datetime, status, address) VALUES (:name, :username, :usernameP, GETDATE(), 1, :address);";
+  $parameters = [":name" => $username, ":username" => $username, ":usernameP" => $usernameP, ":address" => $address];
+
+  try {
+    $statement = $verbinding->prepare($query);
+    $statement->execute($parameters);
+
+    $id = getHighestId($username);
+    addOrderItems($id, $orders);
+  } catch (PDOException $e) {
+    error_log("Error executing query: " . $e->getMessage());
+    return null;
+  }
+}
+
+function addOrderItems($id, $orders)
+{
+  global $verbinding;
+  
+  var_dump($orders);
+  var_dump($id);
+
+  foreach ($orders as $order) {
+    $name = $order["product"];
+    $quantity = $order["quantity"];
+
+    $query = "INSERT INTO Pizza_Order_Product(order_id, product_name, quantity) VALUES (:id, :name, :quantity)";
+    $parameters = [":id" => $id, ":name" => $name, ":quantity" => $quantity];
+    try {
+      $statement = $verbinding->prepare($query);
+      $statement->execute($parameters);
+    } catch (PDOException $e) {
+      error_log("Error executing query: " . $e->getMessage());
+      return null;
+    }
+  }
+}
+
+function getHighestId($username)
+{
+  global $verbinding;
+
+  $query = "SELECT MAX(order_id) as max_id FROM Pizza_Order WHERE client_name = :username";
+  $parameters = [":username" => $username];
+  try {
+    $statement = $verbinding->prepare($query);
+    $statement->execute($parameters);
+    $result = $statement->fetch(PDO::FETCH_ASSOC);
+
+    return $result['max_id'];
+  } catch (PDOException $e) {
+    error_log("Error executing query: " . $e->getMessage());
+    return null;
+  }
+
+}
+
+function getRandomPersonnel()
+{
+  global $verbinding;
+
+  $query = 'SELECT username FROM "User" WHERE role = :role';
+  $parameters = [':role' => 'Personnel'];
+  try {
+    $statement = $verbinding->prepare($query);
+    $statement->execute($parameters);
+    $usernames = $statement->fetchAll(PDO::FETCH_COLUMN);
+    if (!empty($usernames)) {
+      return $usernames[array_rand($usernames)];
+    } else {
+      return null;
+    }
+  } catch (PDOException $e) {
+    error_log('Error executing query: ' . $e->getMessage());
+    return null;
+  }
+}
+
 function checkUserExists($username)
 {
   global $verbinding;
@@ -240,12 +323,12 @@ function updateStatus($id, $status)
   global $verbinding;
 
   $query = 'UPDATE Pizza_Order SET status = :status WHERE order_id = :id';
-  $parameters = [':status' => $status,':id'=> $id];
+  $parameters = [':status' => $status, ':id' => $id];
   try {
     $statement = $verbinding->prepare($query);
     $statement->execute($parameters);
   } catch (PDOException $e) {
-    error_log(''. $e->getMessage());
+    error_log('Error executing query: ' . $e->getMessage());
   }
 }
 
@@ -264,16 +347,16 @@ function getValidId($username)
       $idArray = [];
 
       foreach ($rows as $row) {
-        $orderId = $row['order_id']; 
+        $orderId = $row['order_id'];
         $idArray[] = $orderId;
       }
-      
+
       return $idArray;
     } else {
       return [];
     }
   } catch (PDOException $e) {
-    error_log('' . $e->getMessage());
+    error_log('Error executing query: ' . $e->getMessage());
     return [];
   }
 }

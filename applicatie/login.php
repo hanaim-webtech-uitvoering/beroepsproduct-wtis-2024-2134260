@@ -20,6 +20,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   if ($result) {
     $_SESSION['username'] = $result['username'];
     $_SESSION['role'] = $result['role'];
+    if (!is_null($result['address'])) {
+      $_SESSION['address'] = $result['address'];
+    }
     header('Location: menu.php');
     exit();
   } else {
@@ -55,6 +58,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <br><br>
     <button type="submit">Login</button>
   </form>
+
+  <a href="register.php">Registreer</a>
 </body>
 
 </html>

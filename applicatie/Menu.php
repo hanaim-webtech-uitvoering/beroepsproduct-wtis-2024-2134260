@@ -8,6 +8,28 @@ if (!isset($_SESSION['username'])) {
   exit();
 }
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+  $productName = $_POST['product_name'];
+  $price = $_POST['price'];
+  $quantity = $_POST['quantity'];
+
+  if (!isset($_SESSION['cart'])) {
+    $_SESSION['cart'] = [];
+  }
+
+  if (isset($_SESSION['cart'][$productName])) {
+    $_SESSION['cart'][$productName]['quantity'] += $quantity;
+  } else {
+    $_SESSION['cart'][$productName] = [
+      'price' => $price,
+      'quantity' => $quantity
+    ];
+  }
+
+  header('Location: menu.php');
+  exit();
+}
+
 $menu = getMenu();
 ?>
 

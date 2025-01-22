@@ -30,6 +30,9 @@ if (!isset($_SESSION['username'])) {
       <li><a href="privacyverklaring.php">Privacyverklaring</a></li>
     </ul>
   </nav>
+  <form action="logout.php" method="post">
+    <button type="submit">Logout</button>
+  </form>
   <h1> Privacyverklaring </h1>
   <p>
     Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec aliquam tristique feugiat. Sed rhoncus imperdiet
