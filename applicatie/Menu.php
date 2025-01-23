@@ -10,24 +10,26 @@ if (!isset($_SESSION['username'])) {
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $productName = $_POST['product_name'];
-  $price = $_POST['price'];
   $quantity = $_POST['quantity'];
 
-  if (!isset($_SESSION['cart'])) {
-    $_SESSION['cart'] = [];
-  }
+  if (is_numeric($quantity)) {
+    if (!isset($_SESSION['cart'])) {
+      $_SESSION['cart'] = [];
+    }
 
-  if (isset($_SESSION['cart'][$productName])) {
-    $_SESSION['cart'][$productName]['quantity'] += $quantity;
+    if (isset($_SESSION['cart'][$productName])) {
+      $_SESSION['cart'][$productName]['quantity'] += $quantity;
+    } else {
+      $_SESSION['cart'][$productName] = [
+        'quantity' => $quantity
+      ];
+    }
+
+    header('Location: menu.php');
+    exit();
   } else {
-    $_SESSION['cart'][$productName] = [
-      'price' => $price,
-      'quantity' => $quantity
-    ];
+    $error = 'De hoeveelheid moet een getal zijn';
   }
-
-  header('Location: menu.php');
-  exit();
 }
 
 $menu = getMenu();
@@ -45,7 +47,11 @@ $menu = getMenu();
 
 <body>
   <?php showNavbar($_SESSION['role']); ?>
-
+  
+  <?php if (!empty($error)): ?>
+    <p style="color: red;"><?php echo $error; ?></p>
+  <?php endif; ?>
+  
   <?php echo $menu; ?>
 </body>
 

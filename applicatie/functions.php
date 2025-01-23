@@ -117,11 +117,11 @@ function getOrderOverview_U($username)
 {
   global $verbinding;
 
-  $query = 'SELECT pop.product_name, pop.quantity FROM Pizza_Order_Product pop INNER JOIN Pizza_Order po ON pop.order_id = po.order_id WHERE client_username = :username';
+  $query = 'SELECT po.order_id, pop.product_name, pop.quantity, po.status FROM Pizza_Order_Product pop INNER JOIN Pizza_Order po ON pop.order_id = po.order_id WHERE client_username = :username';
   $parameters = [':username' => $username];
 
   $orders = "<table>";
-  $orders .= "<tr><th>Product</th><th>Hoeveelheid</th></tr>";
+  $orders .= "<tr><th>Id</th><th>Product</th><th>Hoeveelheid</th><th>Status</th></tr>";
 
   try {
     $statement = $verbinding->prepare($query);
@@ -130,10 +130,12 @@ function getOrderOverview_U($username)
 
     if ($rows) {
       foreach ($rows as $row) {
+        $id = $row['order_id'];
         $productName = $row['product_name'];
         $quantity = $row['quantity'];
+        $status = $row['status'];
 
-        $orders .= "<tr><td>$productName</td><td>$quantity</td></tr>";
+        $orders .= "<tr><td>$id</td><td>$productName</td><td>$quantity</td><td>$status</td></tr>";
       }
     }
 
