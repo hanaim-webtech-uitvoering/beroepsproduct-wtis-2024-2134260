@@ -381,5 +381,72 @@ function showNavbar($role) {
         <form action="logout.php" method="post">
           <button type="submit">Logout</button>
         </form>';
-  
+}
+
+function showCartTable($cart) {
+    if (empty($cart)) {
+        return '<p>Uw winkelmandje is leeg</p>';
+    }
+
+    $table = '<table>';
+    $table .= '
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Prijs</th>
+                <th>Aantal</th>
+            </tr>
+        </thead>
+        <tbody>
+    ';
+
+    foreach ($cart as $product => $details) {
+        $table .= '<tr>';
+        $table .= '<td>' . $product . '</td>';
+        $table .= '<td>€' . $details['price'] . '</td>';
+        $table .= '<td>' . $details['quantity'] . '</td>';
+        $table .= '
+            <td>
+                <form action="updateShoppingCart.php" method="post">
+                    <input type="hidden" name="product" value="' . $product . '">
+                    <input type="number" name="quantity" value="' . $details['quantity'] . '" min="1">
+                    <button type="submit">Update</button>
+                </form>
+                <form action="removeFromShoppingCart.php" method="post" >
+                    <input type="hidden" name="product" value="' . $product . '">
+                    <button type="submit">Verwijder</button>
+                </form>
+            </td>
+        ';
+        $table .= '</tr>';
+    }
+
+    $table .= '</tbody></table>';
+    return $table;
+}
+
+function showAddressForm($address, $error = null) {
+    $form = '
+        <form action="" method="post">
+            <label for="address">Voer uw adres in:</label>
+            <input type="text" id="address" name="address" 
+                   value="' . htmlspecialchars($address ?? '') . '" required>
+            <button type="submit">Opslaan</button>
+        </form>
+    ';
+
+    if (!empty($error)) {
+        $form .= '<p style="color: red;">' . htmlspecialchars($error) . '</p>';
+    }
+
+    if (!empty($address)) {
+        $form .= '<p>Huidig adres: ' . htmlspecialchars($address) . '</p>';
+        $form .= '
+            <form action="checkout.php" method="post">
+                <button type="submit">Afrekenen</button>
+            </form>
+        ';
+    }
+
+    return $form;
 }
