@@ -18,6 +18,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['address'])) {
     $error = "Adres is verplicht.";
   }
 }
+
+$errorQuantity = $_SESSION['error'] ?? null;
 ?>
 
 <!DOCTYPE html>
@@ -31,7 +33,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['address'])) {
 
 <body>
   <?php showNavbar($_SESSION['role']); ?>
-
+  
+  <?php if (!empty($errorQuantity)): ?>
+    <p style="color: red;"><?php echo $errorQuantity; ?></p>
+  <?php endif; ?>
+  
   <?php if (empty($cart)): ?>
     <p>Uw winkelmandje is leeg</p>
   <?php else: ?>

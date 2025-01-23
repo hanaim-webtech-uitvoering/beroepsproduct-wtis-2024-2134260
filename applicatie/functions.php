@@ -383,5 +383,3 @@ function showNavbar($role) {
         </form>';
   
 }
-
-?>

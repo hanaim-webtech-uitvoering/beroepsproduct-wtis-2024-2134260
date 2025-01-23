@@ -11,8 +11,9 @@ if (!isset($_SESSION['username'])) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $productName = $_POST['product_name'];
   $quantity = $_POST['quantity'];
+  $price = $_POST['price'];
 
-  if (is_numeric($quantity)) {
+  if (is_numeric($quantity) || $quantity > 0) {
     if (!isset($_SESSION['cart'])) {
       $_SESSION['cart'] = [];
     }
@@ -21,6 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $_SESSION['cart'][$productName]['quantity'] += $quantity;
     } else {
       $_SESSION['cart'][$productName] = [
+        'price' => $price,
         'quantity' => $quantity
       ];
     }
@@ -28,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     header('Location: menu.php');
     exit();
   } else {
-    $error = 'De hoeveelheid moet een getal zijn';
+    $error = 'De hoeveelheid moet een geldig getal zijn en groter dan nul';
   }
 }
 
